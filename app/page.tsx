@@ -270,6 +270,7 @@ export default function WeddingSite() {
                   style={{
                     textAlign: "left",
                     paddingRight: 24,
+                    paddingLeft:24,
                     borderRight:
                       i < countdownItems.length - 1
                         ? `1px solid ${COLORS.line}`
