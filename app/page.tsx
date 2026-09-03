@@ -194,26 +194,25 @@ export default function WeddingSite() {
             <h1
               className="display"
               style={{
-                fontSize: "clamp(48px, 8vw, 108px)",
+                fontSize: "clamp(48px, 6vw, 80px)",
+                fontStyle: "italic",
                 lineHeight: 0.98,
                 margin: 0,
                 fontWeight: 500,
+                whiteSpace: "nowrap",
               }}
             >
-              {NAMES.first}
-
+              {NAMES.first}{" "}
               <em
                 style={{
                   fontStyle: "italic",
                   fontWeight: 300,
-                  color: COLORS.green,
-                  display: "block",
                   fontSize: "0.5em",
-                  margin: "6px 0",
                 }}
               >
-                &amp; {NAMES.second}
-              </em>
+                &amp;
+              </em>{" "}
+              {NAMES.second}
             </h1>
 
             <p
