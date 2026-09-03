@@ -316,7 +316,7 @@ export default function WeddingSite() {
           <p className="section-label">The details</p>
 
           <h2 className="display section-heading">
-            When &amp; where
+            When &amp; Where
           </h2>
 
           <div className="details-grid">
