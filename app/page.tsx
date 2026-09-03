@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const NAMES = {
   first: "Claire",
@@ -395,6 +396,24 @@ export default function WeddingSite() {
         >
           We can&apos;t wait to celebrate with you.
         </p>
+        <Link
+          href="/login"
+          style={{
+            display: "inline-block",
+            marginTop: 32,
+            padding: "13px 28px",
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 14,
+            letterSpacing: "0.02em",
+            fontWeight: 500,
+            color: "#fff",
+            background: COLORS.green,
+            textDecoration: "none",
+            borderRadius: 2,
+          }}
+        >
+          RSVP
+        </Link>
       </footer>
     </main>
   );
