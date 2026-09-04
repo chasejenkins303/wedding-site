@@ -51,7 +51,7 @@ export default async function LoginPage({
 
       <div style={{ width: "100%", maxWidth: 380 }}>
         <p style={{ fontSize: 13, letterSpacing: "0.02em", color: COLORS.ink60, margin: "0 0 10px", textAlign: "center" }}>
-          Alex &amp; Jordan
+          Claire &amp; Chase
         </p>
         <h1 className="display" style={{ fontSize: 32, margin: "0 0 32px", textAlign: "center" }}>
           Sign in
