@@ -3,9 +3,7 @@
     - Reception
     - Venue
     - Dress Code
-- RSVP's via QR codes / website and stored responses
-    - Some form of authentication with the QR codes to know who responded (via phone number or auth via OAuth (or other thing) and phone number entered after that so we can identify or something)
-    - RSVP should have option for eveyrone in the household (currently just a number)
-- Info for people staying the night (RBAC for viewing, not eveyone is staying and there should be an allowlist for who can see overnight info)
-- Admin page for me to view RSVP responses, who has an account and what their view access is, etc.
+- RSVP's via QR codes
+- Update error messages / messages about phone #, invite wasn't sent to their phone number
+- Messaging in general
 - Get everyones phone number

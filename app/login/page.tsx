@@ -1,4 +1,4 @@
-import { signIn, signUp } from "./actions";
+import LoginForm from "./login-form";
 
 const COLORS = {
   stone: "#EAE5D8",
@@ -12,9 +12,10 @@ const COLORS = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; mode?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, next, mode } = await searchParams;
+  const initialMode = mode === "signup" ? "signup" : "signin";
 
   return (
     <div
@@ -46,31 +47,6 @@ export default async function LoginPage({
           box-sizing: border-box;
         }
         input:focus { outline: 2px solid ${COLORS.green}; outline-offset: 1px; }
-        button.primary {
-          width: 100%;
-          padding: 13px 14px;
-          font-family: 'Jost', sans-serif;
-          font-size: 14px;
-          letter-spacing: 0.02em;
-          font-weight: 500;
-          color: #fff;
-          background: ${COLORS.green};
-          border: none;
-          border-radius: 2px;
-          cursor: pointer;
-        }
-        button.secondary {
-          width: 100%;
-          padding: 13px 14px;
-          font-family: 'Jost', sans-serif;
-          font-size: 14px;
-          letter-spacing: 0.02em;
-          color: ${COLORS.green};
-          background: transparent;
-          border: 1px solid ${COLORS.green};
-          border-radius: 2px;
-          cursor: pointer;
-        }
       `}</style>
 
       <div style={{ width: "100%", maxWidth: 380 }}>
@@ -78,7 +54,7 @@ export default async function LoginPage({
           Alex &amp; Jordan
         </p>
         <h1 className="display" style={{ fontSize: 32, margin: "0 0 32px", textAlign: "center" }}>
-          Sign in to RSVP
+          Sign in
         </h1>
 
         {error && (
@@ -97,33 +73,11 @@ export default async function LoginPage({
           </p>
         )}
 
-        <form style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div>
-            <label htmlFor="email" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
-              Email
-            </label>
-            <input id="email" name="email" type="email" required autoComplete="email" />
-          </div>
-          <div>
-            <label htmlFor="password" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
-              Password
-            </label>
-            <input id="password" name="password" type="password" required minLength={6} autoComplete="current-password" />
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
-            <button className="primary" formAction={signIn}>
-              Sign in
-            </button>
-            <button className="secondary" formAction={signUp}>
-              Create account
-            </button>
-          </div>
-        </form>
+        <LoginForm next={next ?? "/"} initialMode={initialMode} />
 
         <p style={{ fontSize: 13, color: COLORS.ink60, textAlign: "center", marginTop: 24, lineHeight: 1.6 }}>
-          First time here? Create an account, then you'll be asked for the
-          phone number your invite was sent to.
+          First time here? You'll need the phone number your invite was
+          sent to — we use it to find your household.
         </p>
       </div>
     </div>

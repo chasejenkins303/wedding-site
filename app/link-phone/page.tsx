@@ -12,9 +12,9 @@ const COLORS = {
 export default async function LinkPhonePage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
 
   return (
     <div
@@ -90,6 +90,7 @@ export default async function LinkPhonePage({
         )}
 
         <form action={linkPhone} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <input type="hidden" name="next" value={next ?? "/rsvp"} />
           <div>
             <label htmlFor="phone_number" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
               Phone number

@@ -23,7 +23,7 @@ export default async function RsvpPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?next=/rsvp");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -31,7 +31,7 @@ export default async function RsvpPage({
     .eq("id", user.id)
     .single();
 
-  if (!profile?.invite_id) redirect("/link-phone");
+  if (!profile?.invite_id) redirect("/link-phone?next=/rsvp");
 
   const { data: invite } = await supabase
     .from("invites")

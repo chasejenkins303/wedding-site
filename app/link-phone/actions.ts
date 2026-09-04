@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 export async function linkPhone(formData: FormData) {
   const phoneNumber = String(formData.get("phone_number") || "").trim();
+  const next = String(formData.get("next") || "/rsvp");
 
   const supabase = await createClient();
 
@@ -13,7 +14,7 @@ export async function linkPhone(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(`/login?next=${encodeURIComponent(next)}`);
   }
 
   // RLS on `invites` only allows reading a row once profiles.invite_id
@@ -26,7 +27,7 @@ export async function linkPhone(formData: FormData) {
 
   if (lookupError || !inviteId) {
     redirect(
-      `/link-phone?error=${encodeURIComponent(
+      `/link-phone?next=${encodeURIComponent(next)}&error=${encodeURIComponent(
         "We couldn't find an invite for that phone number. Double check it, or reach out to us directly."
       )}`
     );
@@ -38,8 +39,10 @@ export async function linkPhone(formData: FormData) {
     .eq("id", user.id);
 
   if (updateError) {
-    redirect(`/link-phone?error=${encodeURIComponent(updateError.message)}`);
+    redirect(
+      `/link-phone?next=${encodeURIComponent(next)}&error=${encodeURIComponent(updateError.message)}`
+    );
   }
 
-  redirect("/rsvp");
+  redirect(next);
 }

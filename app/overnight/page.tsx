@@ -17,7 +17,7 @@ export default async function OvernightPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?next=/overnight");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -25,7 +25,7 @@ export default async function OvernightPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile?.invite_id) redirect("/link-phone");
+  if (!profile?.invite_id) redirect("/link-phone?next=/overnight");
 
   const { data: invite } = await supabase
     .from("invites")

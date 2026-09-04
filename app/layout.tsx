@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import HomeNav from "@/components/home-nav";
 
 export const metadata: Metadata = {
   title: "Claire & Chase",
@@ -12,8 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" style={{ position: "relative" }}>
+        <HomeNav />
+        {children}
     </html>
   );
 }

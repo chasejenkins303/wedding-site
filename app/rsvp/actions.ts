@@ -9,7 +9,7 @@ export async function submitRsvp(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?next=/rsvp");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -17,7 +17,7 @@ export async function submitRsvp(formData: FormData) {
     .eq("id", user.id)
     .single();
 
-  if (!profile?.invite_id) redirect("/link-phone");
+  if (!profile?.invite_id) redirect("/link-phone?next=/rsvp");
 
   const attending = formData.get("attending") === "yes";
   const guestCount = attending ? Number(formData.get("guest_count") || 1) : 0;
