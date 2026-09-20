@@ -3,44 +3,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export async function submitRsvp(formData: FormData) {
+export async function findInvite(formData: FormData) {
+  const name = String(formData.get("household_name") || "").trim();
+
   const supabase = await createClient();
+  const { data: token } = await supabase.rpc("find_invite_by_name", { p_name: name });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login?next=/rsvp");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("invite_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.invite_id) redirect("/link-phone?next=/rsvp");
-
-  const attending = formData.get("attending") === "yes";
-  const guestCount = attending ? Number(formData.get("guest_count") || 1) : 0;
-  const mealChoice = attending ? String(formData.get("meal_choice") || "") : null;
-
-  // upsert on invite_id — if a second person in the same household submits
-  // later, this simply overwrites the first response rather than erroring.
-  const { error } = await supabase
-    .from("rsvps")
-    .upsert(
-      {
-        invite_id: profile.invite_id,
-        attending,
-        guest_count: guestCount,
-        meal_choice: mealChoice,
-        submitted_at: new Date().toISOString(),
-      },
-      { onConflict: "invite_id" }
+  if (!token) {
+    redirect(
+      `/rsvp?error=${encodeURIComponent(
+        "We couldn't find an invite under that name — try the name on your invitation exactly, or reach out to us directly."
+      )}`
     );
-
-  if (error) {
-    redirect(`/rsvp?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/rsvp?saved=1");
+  redirect(`/rsvp/${token}`);
 }

@@ -13,9 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ position: "relative" }}>
+    <html lang="en">
+      <body style={{ position: "relative" }}>
         <HomeNav />
         {children}
+      </body>
     </html>
   );
 }

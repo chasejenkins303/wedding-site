@@ -1,44 +1,21 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-async function assertAdmin() {
+export async function findInviteForOvernight(formData: FormData) {
+  const name = String(formData.get("household_name") || "").trim();
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data: token } = await supabase.rpc("find_invite_by_name", { p_name: name });
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
+  if (!token) {
+    redirect(
+      `/overnight?error=${encodeURIComponent(
+        "We couldn't find an invite under that name — try the name on your invitation exactly, or reach out to us directly."
+      )}`
+    );
+  }
 
-  if (!profile?.is_admin) redirect("/rsvp");
-}
-
-export async function toggleOvernightAccess(formData: FormData) {
-  await assertAdmin();
-  const inviteId = String(formData.get("invite_id"));
-  const next = formData.get("next") === "true";
-
-  const admin = createAdminClient();
-  await admin.from("invites").update({ overnight_access: next }).eq("id", inviteId);
-
-  revalidatePath("/admin");
-}
-
-export async function toggleAdmin(formData: FormData) {
-  await assertAdmin();
-  const profileId = String(formData.get("profile_id"));
-  const next = formData.get("next") === "true";
-
-  const admin = createAdminClient();
-  await admin.from("profiles").update({ is_admin: next }).eq("id", profileId);
-
-  revalidatePath("/admin");
+  redirect(`/overnight/${token}`);
 }

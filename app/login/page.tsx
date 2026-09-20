@@ -1,4 +1,4 @@
-import LoginForm from "./login-form";
+import { signIn } from "./actions";
 
 const COLORS = {
   stone: "#EAE5D8",
@@ -9,13 +9,13 @@ const COLORS = {
   line: "#C9C2AC",
 };
 
+// Admin-only sign-in now — guests never see or need this page.
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string; mode?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const { error, next, mode } = await searchParams;
-  const initialMode = mode === "signup" ? "signup" : "signin";
+  const { error, next } = await searchParams;
 
   return (
     <div
@@ -47,11 +47,24 @@ export default async function LoginPage({
           box-sizing: border-box;
         }
         input:focus { outline: 2px solid ${COLORS.green}; outline-offset: 1px; }
+        button.primary {
+          width: 100%;
+          padding: 13px 14px;
+          font-family: 'Jost', sans-serif;
+          font-size: 14px;
+          letter-spacing: 0.02em;
+          font-weight: 500;
+          color: #fff;
+          background: ${COLORS.green};
+          border: none;
+          border-radius: 2px;
+          cursor: pointer;
+        }
       `}</style>
 
       <div style={{ width: "100%", maxWidth: 380 }}>
         <p style={{ fontSize: 13, letterSpacing: "0.02em", color: COLORS.ink60, margin: "0 0 10px", textAlign: "center" }}>
-          Claire &amp; Chase
+          Admin
         </p>
         <h1 className="display" style={{ fontSize: 32, margin: "0 0 32px", textAlign: "center" }}>
           Sign in
@@ -73,12 +86,24 @@ export default async function LoginPage({
           </p>
         )}
 
-        <LoginForm next={next ?? "/"} initialMode={initialMode} />
-
-        <p style={{ fontSize: 13, color: COLORS.ink60, textAlign: "center", marginTop: 24, lineHeight: 1.6 }}>
-          First time here? You'll need the phone number your invite was
-          sent to — we use it to find your household.
-        </p>
+        <form action={signIn} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <input type="hidden" name="next" value={next ?? "/admin"} />
+          <div>
+            <label htmlFor="email" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
+              Email
+            </label>
+            <input id="email" name="email" type="email" required autoComplete="email" />
+          </div>
+          <div>
+            <label htmlFor="password" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
+              Password
+            </label>
+            <input id="password" name="password" type="password" required minLength={6} autoComplete="current-password" />
+          </div>
+          <button className="primary" type="submit" style={{ marginTop: 8 }}>
+            Enter
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -1,7 +1,4 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import RsvpForm from "./rsvp-form";
+import { findInvite } from "./actions";
 
 const COLORS = {
   stone: "#EAE5D8",
@@ -12,38 +9,12 @@ const COLORS = {
   line: "#C9C2AC",
 };
 
-export default async function RsvpPage({
+export default async function RsvpLookupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; saved?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const { error, saved } = await searchParams;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login?next=/rsvp");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("invite_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.invite_id) redirect("/link-phone?next=/rsvp");
-
-  const { data: invite } = await supabase
-    .from("invites")
-    .select("household_name, max_guests, overnight_access")
-    .eq("id", profile.invite_id)
-    .single();
-
-  const { data: rsvp } = await supabase
-    .from("rsvps")
-    .select("attending, guest_count, meal_choice")
-    .eq("invite_id", profile.invite_id)
-    .maybeSingle();
+  const { error } = await searchParams;
 
   return (
     <div
@@ -53,41 +24,56 @@ export default async function RsvpPage({
         color: COLORS.ink,
         fontFamily: "'Jost', sans-serif",
         fontWeight: 300,
-        padding: "64px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
       }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400&family=Jost:wght@300;400;500&display=swap');
         .display { font-family: 'Fraunces', serif; font-weight: 500; }
+        input[type="text"] {
+          width: 100%;
+          padding: 12px 14px;
+          font-family: 'Jost', sans-serif;
+          font-size: 15px;
+          font-weight: 300;
+          color: ${COLORS.ink};
+          background: #fff;
+          border: 1px solid ${COLORS.line};
+          border-radius: 2px;
+          box-sizing: border-box;
+        }
+        input:focus { outline: 2px solid ${COLORS.green}; outline-offset: 1px; }
+        button.primary {
+          width: 100%;
+          padding: 13px 14px;
+          font-family: 'Jost', sans-serif;
+          font-size: 14px;
+          letter-spacing: 0.02em;
+          font-weight: 500;
+          color: #fff;
+          background: ${COLORS.green};
+          border: none;
+          border-radius: 2px;
+          cursor: pointer;
+        }
       `}</style>
 
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <p style={{ fontSize: 13, letterSpacing: "0.02em", color: COLORS.brass, margin: "0 0 10px", textAlign: "center" }}>
-          {invite?.household_name}
+      <div style={{ width: "100%", maxWidth: 380 }}>
+        <p style={{ fontSize: 13, letterSpacing: "0.02em", color: COLORS.ink60, margin: "0 0 10px", textAlign: "center" }}>
+          Chase &amp; Claire
         </p>
-        <h1 className="display" style={{ fontSize: 34, margin: "0 0 12px", textAlign: "center" }}>
-          You're invited
+        <h1 className="display" style={{ fontSize: 30, margin: "0 0 14px", textAlign: "center" }}>
+          Find your invite
         </h1>
-        <p style={{ fontSize: 15, color: COLORS.ink60, textAlign: "center", lineHeight: 1.6, margin: "0 0 36px" }}>
-          Let us know if you'll be joining us — and how many from your household.
+        <p style={{ fontSize: 15, color: COLORS.ink60, textAlign: "center", lineHeight: 1.6, margin: "0 0 28px" }}>
+          Scanned a QR code or clicked a link already? You should be all set.
+          Otherwise, enter your name (or your household name as it appears on your
+          invitation).
         </p>
 
-        {saved && (
-          <p
-            style={{
-              background: "#E4EDE5",
-              border: "1px solid #A9C4AC",
-              color: COLORS.green,
-              fontSize: 14,
-              padding: "10px 14px",
-              borderRadius: 2,
-              marginBottom: 20,
-              textAlign: "center",
-            }}
-          >
-            Your RSVP has been saved.
-          </p>
-        )}
         {error && (
           <p
             style={{
@@ -98,27 +84,30 @@ export default async function RsvpPage({
               padding: "10px 14px",
               borderRadius: 2,
               marginBottom: 20,
-              textAlign: "center",
             }}
           >
             {error}
           </p>
         )}
 
-        <RsvpForm
-          maxGuests={invite?.max_guests ?? 1}
-          initialAttending={rsvp?.attending ?? null}
-          initialGuestCount={rsvp?.guest_count ?? 1}
-          initialMealChoice={rsvp?.meal_choice ?? ""}
-        />
-
-        {invite?.overnight_access && (
-          <p style={{ textAlign: "center", marginTop: 28, fontSize: 14 }}>
-            <Link href="/overnight" style={{ color: COLORS.green }}>
-              View overnight stay info →
-            </Link>
-          </p>
-        )}
+        <form action={findInvite} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label htmlFor="household_name" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
+              Name
+            </label>
+            <input
+              id="household_name"
+              name="household_name"
+              type="text"
+              required
+              placeholder="e.g. The Reyes Family"
+              autoComplete="off"
+            />
+          </div>
+          <button className="primary" type="submit" style={{ marginTop: 8 }}>
+            Continue
+          </button>
+        </form>
       </div>
     </div>
   );

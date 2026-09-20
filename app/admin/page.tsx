@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { toggleOvernightAccess, toggleAdmin } from "./actions";
+import { toggleOvernightAccess } from "./actions";
 
 const COLORS = {
   stone: "#EAE5D8",
@@ -26,23 +26,16 @@ export default async function AdminPage() {
     .eq("id", user.id)
     .single();
 
-  if (!myProfile?.is_admin) redirect("/rsvp");
+  if (!myProfile?.is_admin) redirect("/");
 
-  // From here down, use the service-role client — bypasses RLS so we can
-  // see every household/account in one dashboard.
   const admin = createAdminClient();
 
-  const [{ data: invites }, { data: profiles }, { data: rsvps }, { data: usersData }] =
-    await Promise.all([
-      admin.from("invites").select("*").order("household_name"),
-      admin.from("profiles").select("*"),
-      admin.from("rsvps").select("*"),
-      admin.auth.admin.listUsers(),
-    ]);
+  const [{ data: invites }, { data: rsvps }] = await Promise.all([
+    admin.from("invites").select("*").order("household_name"),
+    admin.from("rsvps").select("*"),
+  ]);
 
-  const emailById = new Map(usersData?.users.map((u) => [u.id, u.email]));
   const rsvpByInvite = new Map(rsvps?.map((r) => [r.invite_id, r]));
-  const profileByInvite = new Map(profiles?.filter((p) => p.invite_id)?.map((p) => [p.invite_id, p]));
 
   return (
     <div
@@ -63,6 +56,7 @@ export default async function AdminPage() {
         td { padding: 12px; border-bottom: 1px solid ${COLORS.line}; vertical-align: top; }
         .pill-btn { font-family: 'Jost', sans-serif; font-size: 12px; padding: 5px 10px; border-radius: 12px; border: 1px solid ${COLORS.line}; background: #fff; cursor: pointer; }
         .pill-btn.on { background: ${COLORS.green}; color: #fff; border-color: ${COLORS.green}; }
+        .copy-link { font-size: 12px; color: ${COLORS.ink60}; word-break: break-all; }
       `}</style>
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -76,28 +70,23 @@ export default async function AdminPage() {
             <thead>
               <tr>
                 <th>Household</th>
-                <th>Phone</th>
-                <th>Account</th>
+                <th>RSVP link</th>
                 <th>RSVP</th>
                 <th>Guests</th>
                 <th>Meal notes</th>
                 <th>Overnight access</th>
-                <th>Admin</th>
               </tr>
             </thead>
             <tbody>
               {invites?.map((invite) => {
                 const rsvp = rsvpByInvite.get(invite.id);
-                const profile = profileByInvite.get(invite.id);
-                const email = profile ? emailById.get(profile.id) : null;
 
                 return (
                   <tr key={invite.id}>
                     <td>
                       <strong>{invite.household_name}</strong>
                     </td>
-                    <td style={{ color: COLORS.ink60 }}>{invite.phone_number}</td>
-                    <td style={{ color: email ? COLORS.ink : COLORS.ink60 }}>{email ?? "No account yet"}</td>
+                    <td className="copy-link">/rsvp/{invite.token}</td>
                     <td>
                       {!rsvp ? (
                         <span style={{ color: COLORS.ink60 }}>Not yet</span>
@@ -118,19 +107,6 @@ export default async function AdminPage() {
                         </button>
                       </form>
                     </td>
-                    <td>
-                      {profile ? (
-                        <form action={toggleAdmin}>
-                          <input type="hidden" name="profile_id" value={profile.id} />
-                          <input type="hidden" name="next" value={(!profile.is_admin).toString()} />
-                          <button type="submit" className={`pill-btn ${profile.is_admin ? "on" : ""}`}>
-                            {profile.is_admin ? "Admin" : "Guest"}
-                          </button>
-                        </form>
-                      ) : (
-                        <span style={{ color: COLORS.ink60 }}>—</span>
-                      )}
-                    </td>
                   </tr>
                 );
               })}
@@ -143,6 +119,9 @@ export default async function AdminPage() {
           {rsvps?.filter((r) => r.attending).length ?? 0} attending ·{" "}
           {rsvps?.filter((r) => r.attending === false).length ?? 0} declined ·{" "}
           {(invites?.length ?? 0) - (rsvps?.length ?? 0)} awaiting response
+        </p>
+        <p style={{ fontSize: 13, color: COLORS.ink60, marginTop: 8 }}>
+          Full RSVP link: <code>yoursite.com/rsvp/&lt;token&gt;</code> — send that (or its QR code) per household.
         </p>
       </div>
     </div>

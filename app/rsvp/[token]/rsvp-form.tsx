@@ -12,11 +12,13 @@ const COLORS = {
 };
 
 export default function RsvpForm({
+  token,
   maxGuests,
   initialAttending,
   initialGuestCount,
   initialMealChoice,
 }: {
+  token: string;
   maxGuests: number;
   initialAttending: boolean | null;
   initialGuestCount: number;
@@ -26,6 +28,8 @@ export default function RsvpForm({
 
   return (
     <form action={submitRsvp} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <input type="hidden" name="token" value={token} />
+
       <div>
         <p style={{ fontSize: 13, color: COLORS.ink60, marginBottom: 10 }}>Will you be attending?</p>
         <div style={{ display: "flex", gap: 12 }}>

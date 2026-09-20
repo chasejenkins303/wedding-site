@@ -18,7 +18,7 @@ async function assertAdmin() {
     .eq("id", user.id)
     .single();
 
-  if (!profile?.is_admin) redirect("/rsvp");
+  if (!profile?.is_admin) redirect("/");
 }
 
 export async function toggleOvernightAccess(formData: FormData) {
@@ -28,17 +28,6 @@ export async function toggleOvernightAccess(formData: FormData) {
 
   const admin = createAdminClient();
   await admin.from("invites").update({ overnight_access: next }).eq("id", inviteId);
-
-  revalidatePath("/admin");
-}
-
-export async function toggleAdmin(formData: FormData) {
-  await assertAdmin();
-  const profileId = String(formData.get("profile_id"));
-  const next = formData.get("next") === "true";
-
-  const admin = createAdminClient();
-  await admin.from("profiles").update({ is_admin: next }).eq("id", profileId);
 
   revalidatePath("/admin");
 }

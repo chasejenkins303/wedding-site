@@ -12,24 +12,44 @@ const WEDDING_DATE = new Date(2027, 7, 14, 17, 0);
 const DETAILS = [
   {
     label: "Date",
-    value: "Saturday, August 14, 2027",
-    note: "Ceremony begins promptly at 5:00 PM",
+    value: "TBD",
+    note: "TBD",
   },
   {
     label: "Reception",
-    value: "Cocktails & dinner to follow",
-    note: "6:00 PM until midnight",
+    value: "TBD",
+    note: "TBD",
   },
   {
     label: "Venue",
-    value: "Twickenham House",
-    note: "1329 Phoenix Colvard Rd, Jefferson, NC 28640",
+    value: "TBD",
+    note: "TBD",
   },
   {
     label: "Dress code",
-    value: "Gym shorts and stained shirts",
-    note: "Don't know yet",
+    value: "TBD",
+    note: "TBD",
   },
+  // {
+  //   label: "Date",
+  //   value: "Saturday, August 14, 2027",
+  //   note: "Ceremony begins promptly at 5:00 PM",
+  // },
+  // {
+  //   label: "Reception",
+  //   value: "Cocktails & dinner to follow",
+  //   note: "6:00 PM until midnight",
+  // },
+  // {
+  //   label: "Venue",
+  //   value: "Twickenham House",
+  //   note: "1329 Phoenix Colvard Rd, Jefferson, NC 28640",
+  // },
+  // {
+  //   label: "Dress code",
+  //   value: "Gym shorts and stained shirts",
+  //   note: "Don't know yet",
+  // },
 ];
 
 const COLORS = {
