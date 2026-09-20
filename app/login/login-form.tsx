@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn, signUp } from "./actions";
+import { signIn } from "./actions";
 
 const COLORS = {
   ink: "#2C2A24",
@@ -67,7 +67,7 @@ export default function LoginForm({
         </button>
       </div>
 
-      <form action={mode === "signin" ? signIn : signUp} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <form action={ signIn } style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <input type="hidden" name="next" value={next} />
 
         <div>
