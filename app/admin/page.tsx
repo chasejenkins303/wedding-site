@@ -96,7 +96,7 @@ export default async function AdminPage() {
                         <span style={{ color: "#7A2E22" }}>Declined</span>
                       )}
                     </td>
-                    <td>{rsvp?.attending ? `${rsvp.guest_count} / ${invite.max_guests}` : "—"}</td>
+                    <td>{rsvp?.attending ? rsvp.attending_guests?.join(", ") || `${rsvp.guest_count} attending` : "—"}</td>
                     <td style={{ color: COLORS.ink60, maxWidth: 220 }}>{rsvp?.meal_choice || "—"}</td>
                     <td>
                       <form action={toggleOvernightAccess}>

@@ -13,25 +13,39 @@ const COLORS = {
 
 export default function RsvpForm({
   token,
-  maxGuests,
+  guestNames,
   initialAttending,
-  initialGuestCount,
+  initialAttendingGuests,
   initialMealChoice,
 }: {
   token: string;
-  maxGuests: number;
+  guestNames: string[];
   initialAttending: boolean | null;
-  initialGuestCount: number;
+  initialAttendingGuests: string[];
   initialMealChoice: string;
 }) {
   const [attending, setAttending] = useState<boolean | null>(initialAttending);
+
+  // Default: everyone in the household checked, unless they've already
+  // submitted before — then reflect exactly who they last checked off.
+  const [checked, setChecked] = useState<Set<string>>(
+    new Set(initialAttendingGuests.length > 0 ? initialAttendingGuests : guestNames)
+  );
+
+  const toggle = (name: string) => {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  };
 
   return (
     <form action={submitRsvp} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <input type="hidden" name="token" value={token} />
 
       <div>
-        <p style={{ fontSize: 13, color: COLORS.ink60, marginBottom: 10 }}>Will you be attending?</p>
+        <p style={{ fontSize: 13, color: COLORS.ink60, marginBottom: 10 }}>Will anyone from your household be attending?</p>
         <div style={{ display: "flex", gap: 12 }}>
           <label
             style={{
@@ -85,36 +99,39 @@ export default function RsvpForm({
       {attending === true && (
         <>
           <div>
-            <label htmlFor="guest_count" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
-              Number attending (up to {maxGuests})
-            </label>
-            <select
-              id="guest_count"
-              name="guest_count"
-              defaultValue={initialGuestCount || 1}
-              style={{
-                width: "100%",
-                padding: "12px 14px",
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                fontWeight: 300,
-                color: COLORS.ink,
-                background: "#fff",
-                border: `1px solid ${COLORS.line}`,
-                borderRadius: 2,
-              }}
-            >
-              {Array.from({ length: maxGuests }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
+            <p style={{ fontSize: 13, color: COLORS.ink60, marginBottom: 10 }}>Who's coming?</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {guestNames.map((name) => (
+                <label
+                  key={name}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "10px 14px",
+                    border: `1px solid ${checked.has(name) ? COLORS.green : COLORS.line}`,
+                    borderRadius: 2,
+                    cursor: "pointer",
+                    fontSize: 15,
+                    background: checked.has(name) ? "rgba(63, 82, 64, 0.06)" : "transparent",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    name="attending_guest"
+                    value={name}
+                    checked={checked.has(name)}
+                    onChange={() => toggle(name)}
+                  />
+                  {name}
+                </label>
               ))}
-            </select>
+            </div>
           </div>
 
           <div>
             <label htmlFor="meal_choice" style={{ display: "block", fontSize: 13, color: COLORS.ink60, marginBottom: 6 }}>
-              Meal notes (one line per guest is fine — e.g. "2 chicken, 1 vegetarian")
+              Meal notes (one line per guest is fine — e.g. "Alex: chicken, Sam: vegetarian")
             </label>
             <textarea
               id="meal_choice"
@@ -141,7 +158,7 @@ export default function RsvpForm({
 
       <button
         type="submit"
-        disabled={attending === null}
+        disabled={attending === null || (attending === true && checked.size === 0)}
         style={{
           padding: "13px 14px",
           fontFamily: "'Jost', sans-serif",
@@ -149,7 +166,7 @@ export default function RsvpForm({
           letterSpacing: "0.02em",
           fontWeight: 500,
           color: "#fff",
-          background: attending === null ? COLORS.line : COLORS.green,
+          background: attending === null || (attending === true && checked.size === 0) ? COLORS.line : COLORS.green,
           border: "none",
           borderRadius: 2,
           cursor: attending === null ? "not-allowed" : "pointer",

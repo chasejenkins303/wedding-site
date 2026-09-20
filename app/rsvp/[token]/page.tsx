@@ -92,9 +92,9 @@ export default async function RsvpTokenPage({
 
         <RsvpForm
           token={token}
-          maxGuests={invite.max_guests}
+          guestNames={invite.guest_names?.length ? invite.guest_names : Array.from({ length: invite.max_guests }, (_, i) => `Guest ${i + 1}`)}
           initialAttending={rsvp?.attending ?? null}
-          initialGuestCount={rsvp?.guest_count ?? 1}
+          initialAttendingGuests={rsvp?.attending_guests ?? []}
           initialMealChoice={rsvp?.meal_choice ?? ""}
         />
       </div>
